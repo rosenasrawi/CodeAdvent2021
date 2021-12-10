@@ -1,16 +1,15 @@
+with open("/Users/rosenasrawi/Documents/VU PhD/Side projects/CodeAdvent2021/10/input10.txt", "r") as syntaxFile:
+    syntax = syntaxFile.readlines()
+    syntax = [i.rstrip("\n") for i in syntax]
 
+# syntax = ['[({(<(())[]>[[{[]{<()<>>','[(()[<>])]({[<{<<[]>>(','{([(<{}[<>[]}>{[]{[(<()>','(((({<>}<{<{<>}{[]{[]{}','[[<[([]))<([[{}[[()]]]','[{[{({}]{}}([{[{{{}}([]','{<[[]]>}<{[{[{[]{()[[[]','[<(<(<(<{}))><([]([]()','<{([([[(<>()){}]>(<<{{','<{([{{}}[<[[[<>{}]]]>[]]']
 
-# syntax = '{([(<{}[<>[]}>{[]{[(<()>'
-syntax = ['[({(<(())[]>[[{[]{<()<>>','[(()[<>])]({[<{<<[]>>(','{([(<{}[<>[]}>{[]{[(<()>','(((({<>}<{<{<>}{[]{[]{}','[[<[([]))<([[{}[[()]]]','[{[{({}]{}}([{[{{{}}([]','{<[[]]>}<{[{[{[]{()[[[]','[<(<(<(<{}))><([]([]()','<{([([[(<>()){}]>(<<{{','<{([{{}}[<[[[<>{}]]]>[]]']
+# Part 1 - Find first incorrect item in syntax
 
 def firstWrongSyntax(line):
-    open = '([{<'
-    close = ')]}>'
-    points = [3,57,1197,25137]
-
-    started = []
-    firstFound = []
-    score = 0
+    open = '([{<'; close = ')]}>'; points = [3,57,1197,25137]
+    started = []; firstFound = []; score = 0
+    
     for i in line:
         if firstFound != []: break
     
@@ -21,7 +20,6 @@ def firstWrongSyntax(line):
                 firstFound = i
             started.pop()        
 
-    # return firstFound
     if firstFound != []:
         score = points[close.index(firstFound)]
     return score
