@@ -3,7 +3,6 @@ with open("/Users/rosenasrawi/Documents/VU PhD/Side projects/CodeAdvent2021/12/i
     cave = caveFile.readlines()
     cave = [i.rstrip("\n") for i in cave]
     cave = [cave[i].split('-') for i in range(len(cave))]
-print(cave)
 
 # cave = ['start-A','start-b','A-c','A-b','b-d','A-end','b-end']
 # cave = [cave[i].split('-') for i in range(len(cave))]
@@ -26,56 +25,7 @@ def createGraph(connections):
                 graph[n].append(o)
     return graph
 
-graph = createGraph(connections = cave)
-
-# Part 1 - find all paths from start to end, big caves unlimited visits
-
-def find_all_paths(graph, start, end, path=[]):
-
-    path = path + [start]
-    if start == end:
-        return [path]
-    if start not in graph:
-        return []
-
-    paths = []
-    for node in graph[start]:
-        if node not in path or node.isupper():
-            newpaths = find_all_paths(graph, node, end, path)
-            for newpath in newpaths:
-                paths.append(newpath)
-    return paths
-
-paths = find_all_paths(graph, 'start', 'end')
-print(len(paths))
-
-# Part 2 - find all paths from start to end, big caves unlimited visits, small caves two visits
-
-def find_all_paths(graph, start, end, path=[]):
-
-    path = path + [start]
-    if start == end:
-        return [path]
-    if start not in graph:
-        return []
-
-    paths = []
-    for node in graph[start]:
-        twoLowers = [i for i in path if i.islower() and path.count(i) == 2 and i !='start']
-
-        if node not in path or node.isupper() or node.islower() and path.count(node) == 1 and node != 'start' and len(twoLowers) == 0:
-            newpaths = find_all_paths(graph, node, end, path)
-            for newpath in newpaths:
-                paths.append(newpath)
-
-    return paths
-
-paths = find_all_paths(graph, 'start', 'end')
-print(len(paths))
-
-
-# General function
-
+# General function to find all paths from node to another
 def find_all_paths(graph, start, end, smalltwice, path=[]):
 
     path = path + [start]
@@ -94,5 +44,13 @@ def find_all_paths(graph, start, end, smalltwice, path=[]):
 
     return paths
 
+# Create graph
+graph = createGraph(connections = cave)
+
+# Part 1 - find all paths from start to end, big caves unlimited visits
+paths = find_all_paths(graph, 'start', 'end', smalltwice=False)
+print(len(paths))
+
+# Part 2 - find all paths from start to end, big caves unlimited visits, first small cave two visits
 paths = find_all_paths(graph, 'start', 'end', smalltwice=True)
 print(len(paths))
