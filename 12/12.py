@@ -1,4 +1,4 @@
-
+# Open data file
 with open("/Users/rosenasrawi/Documents/VU PhD/Side projects/CodeAdvent2021/12/input12.txt", "r") as caveFile:
     cave = caveFile.readlines()
     cave = [i.rstrip("\n") for i in cave]
@@ -8,7 +8,7 @@ print(cave)
 # cave = ['start-A','start-b','A-c','A-b','b-d','A-end','b-end']
 # cave = [cave[i].split('-') for i in range(len(cave))]
 
-
+# Greate graph from connections
 def createGraph(connections):
 
     # Find unique nodes
@@ -28,6 +28,7 @@ def createGraph(connections):
 
 graph = createGraph(connections = cave)
 
+# Part 1 - find all paths from start to end, big caves unlimited visits
 
 def find_all_paths(graph, start, end, path=[]):
 
@@ -45,6 +46,53 @@ def find_all_paths(graph, start, end, path=[]):
                 paths.append(newpath)
     return paths
 
-paths = find_all_paths(graph, 'start', 'end', path = [])
+paths = find_all_paths(graph, 'start', 'end')
 print(len(paths))
 
+# Part 2 - find all paths from start to end, big caves unlimited visits, small caves two visits
+
+def find_all_paths(graph, start, end, path=[]):
+
+    path = path + [start]
+    if start == end:
+        return [path]
+    if start not in graph:
+        return []
+
+    paths = []
+    for node in graph[start]:
+        twoLowers = [i for i in path if i.islower() and path.count(i) == 2 and i !='start']
+
+        if node not in path or node.isupper() or node.islower() and path.count(node) == 1 and node != 'start' and len(twoLowers) == 0:
+            newpaths = find_all_paths(graph, node, end, path)
+            for newpath in newpaths:
+                paths.append(newpath)
+
+    return paths
+
+paths = find_all_paths(graph, 'start', 'end')
+print(len(paths))
+
+
+# General function
+
+def find_all_paths(graph, start, end, smalltwice, path=[]):
+
+    path = path + [start]
+    if start == end:
+        return [path]
+    if start not in graph:
+        return []
+
+    paths = []
+    for node in graph[start]:
+        twoLowers = [i for i in path if i.islower() and path.count(i) == 2 and i !='start']
+        if node not in path or node.isupper() or smalltwice and node.islower() and path.count(node) == 1 and node != 'start' and len(twoLowers) == 0:
+            newpaths = find_all_paths(graph, node, end, smalltwice, path)
+            for newpath in newpaths:
+                paths.append(newpath)
+
+    return paths
+
+paths = find_all_paths(graph, 'start', 'end', smalltwice=True)
+print(len(paths))
