@@ -77,6 +77,7 @@ paper = coordinatesFill(coordinates)
 
 firstInst = instructions[0]
 paper1, countOverlap = foldPaper(newpaper = paper, type = firstInst[0], fold = firstInst[1])
+
 print(countOverlap)
 
 # Part 2 - fold paper with complete instructions and print letters
@@ -86,4 +87,5 @@ for inst in instructions:
     if inst == instructions[0]:
         paper1, countOverlap = foldPaper(newpaper = paper, type = inst[0], fold = inst[1])
     else: paper1, countOverlap = foldPaper(newpaper = paper1, type = inst[0], fold = inst[1])
-print(paper1)
+
+for i in paper1: print(i)
