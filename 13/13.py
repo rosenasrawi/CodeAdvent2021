@@ -1,5 +1,29 @@
-coordinates = [[6,10],[0,14],[9,10],[0,3],[10,4],[4,11],[6,0],[6,12],[4,1],[0,13],[10,12],[3,4],[3,0],[8,4],[1,10],[2,14],[8,10],[9,0]]
+# Open data file
+with open("/Users/rosenasrawi/Documents/VU PhD/Side projects/CodeAdvent2021/13/input13.txt", "r") as instrFile:
+    coorInstr = instrFile.readlines()
+    coorInstr = [i.rstrip("\n") for i in coorInstr]
+    
+    i = 0; fold = False
+    while not fold:
+        if 'fold' in coorInstr[i]: fold = True
+        i+=1
 
+    coordinates = coorInstr[:i-2]
+    instructions = coorInstr[i-1:]
+
+    for coor in range(len(coordinates)): 
+        coordinates[coor] = list(map(int,coordinates[coor].split(',')))
+
+    for i in range(len(instructions)):
+        inst = instructions[i]; inst = inst.split()
+        inst = inst[-1].split('='); inst[1] = int(inst[1])
+        instructions[i] = inst
+
+# Example data
+# coordinates = [[6,10],[0,14],[9,10],[0,3],[10,4],[4,11],[6,0],[6,12],[4,1],[0,13],[10,12],[3,4],[3,0],[8,4],[1,10],[2,14],[8,10],[9,0]]
+# instructions = [['y',7], ['x',5]]
+
+# Function to fill paper with coordinates
 def coordinatesFill(coordinates, x = [], y = []):
     for i in coordinates:
         x += [i[0]]; y += [i[1]]    
@@ -12,11 +36,11 @@ def coordinatesFill(coordinates, x = [], y = []):
     
     return paper
 
-paper = coordinatesFill(coordinates)
+# Function to fold a paper along x or y, at certain number
+def foldPaper(paper, type, fold, countOverlap = 0):
 
-def foldPaper(paper, countOverlap = 0, foldY = []):
-    if foldY != []:
-        paper1 = paper[:foldY]; paper2 = paper[foldY+1:]
+    if type == 'y':
+        paper1 = paper[:fold]; paper2 = paper[fold+1:]
 
         r1 = list(range(len(paper1)))           # 0 to end
         r2 = list(range(len(paper2)-1,-1,-1))   # end to 0
@@ -30,7 +54,23 @@ def foldPaper(paper, countOverlap = 0, foldY = []):
 
         for row in paper1:
             countOverlap += row.count('#')
-        
-        return countOverlap
 
-print(foldPaper(paper, foldY = 7))
+    if type == 'x':
+        for row in paper:
+            row1 = row[:fold]; row2 = row[fold+1:]
+            
+            r1 = list(range(len(row1)-1,-1,-1)) # end to 0
+            r2 = list(range(len(row2)))         # 0 to end
+
+            for i in r2:
+                if row1[r1[i]] == '#': row2[i] = row1[r1[i]]
+
+            countOverlap += row2.count('#')   
+
+    return countOverlap
+
+# Part 1 - fold paper according to first instruction
+paper = coordinatesFill(coordinates)
+
+firstInst = instructions[0]
+print(foldPaper(paper, type = firstInst[0], fold = firstInst[1]))
