@@ -80,4 +80,4 @@ paper1 = coordinatesFill(coordinates)
 for inst in instructions:
     paper1, countOverlap = foldPaper(newpaper = paper1, type = inst[0], fold = inst[1])
 
-for i in paper1: print(i)
+for i in paper1: print(' '.join(i))
