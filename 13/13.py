@@ -8,15 +8,13 @@ with open("/Users/rosenasrawi/Documents/VU PhD/Side projects/CodeAdvent2021/13/i
         if 'fold' in coorInstr[i]: fold = True
         i+=1
 
-    coordinates = coorInstr[:i-2]
-    instructions = coorInstr[i-1:]
+    coordinates = coorInstr[:i-2]; instructions = coorInstr[i-1:]
 
     for coor in range(len(coordinates)): 
         coordinates[coor] = list(map(int,coordinates[coor].split(',')))
 
     for i in range(len(instructions)):
-        inst = instructions[i]; inst = inst.split()
-        inst = inst[-1].split('='); inst[1] = int(inst[1])
+        inst = instructions[i]; inst = inst.split(); inst = inst[-1].split('='); inst[1] = int(inst[1])
         instructions[i] = inst
 
 # Example data
@@ -25,14 +23,13 @@ with open("/Users/rosenasrawi/Documents/VU PhD/Side projects/CodeAdvent2021/13/i
 
 # Function to fill paper with coordinates
 def coordinatesFill(coordinates, x = [], y = []):
-    for i in coordinates:
+    for i in coordinates: 
         x += [i[0]]; y += [i[1]]    
 
     paper = [['.' for col in range(max(x)+1)] for row in range(max(y)+1)]
 
-    for coor in coordinates:
-        i = coor[0]; j = coor[1]
-        paper[j][i] = '#'
+    for coor in coordinates: 
+        i = coor[0]; j = coor[1]; paper[j][i] = '#'
     
     return paper
 
@@ -57,9 +54,9 @@ def foldPaper(newpaper, type, fold, countOverlap = 0):
         
     if type == 'x':
         paper1 = []
+
         for i in range(len(newpaper)):
-            row = newpaper[i]
-            row1 = row[:fold]; row2 = row[fold+1:]
+            row = newpaper[i]; row1 = row[:fold]; row2 = row[fold+1:]
 
             r1 = list(range(len(row1)))         # 0 to end
             r2 = list(range(len(row2)-1,-1,-1)) # end to 0
@@ -67,25 +64,20 @@ def foldPaper(newpaper, type, fold, countOverlap = 0):
             for i in r1:
                 if row2[r2[i]] == '#': row1[i] = row2[r2[i]]
             
-            paper1.append(row1)
-            countOverlap += row1.count('#')
+            paper1.append(row1); countOverlap += row1.count('#')
 
     return paper1, countOverlap
 
 # Part 1 - fold paper according to first instruction
 paper = coordinatesFill(coordinates)
-
-firstInst = instructions[0]
-paper1, countOverlap = foldPaper(newpaper = paper, type = firstInst[0], fold = firstInst[1])
+paper1, countOverlap = foldPaper(newpaper = paper, type = instructions[0][0], fold = instructions[0][1])
 
 print(countOverlap)
 
 # Part 2 - fold paper with complete instructions and print letters
-paper = coordinatesFill(coordinates)
+paper1 = coordinatesFill(coordinates)
 
 for inst in instructions:
-    if inst == instructions[0]:
-        paper1, countOverlap = foldPaper(newpaper = paper, type = inst[0], fold = inst[1])
-    else: paper1, countOverlap = foldPaper(newpaper = paper1, type = inst[0], fold = inst[1])
+    paper1, countOverlap = foldPaper(newpaper = paper1, type = inst[0], fold = inst[1])
 
 for i in paper1: print(i)
