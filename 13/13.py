@@ -37,10 +37,10 @@ def coordinatesFill(coordinates, x = [], y = []):
     return paper
 
 # Function to fold a paper along x or y, at certain number
-def foldPaper(paper, type, fold, countOverlap = 0):
+def foldPaper(newpaper, type, fold, countOverlap = 0):
 
     if type == 'y':
-        paper1 = paper[:fold]; paper2 = paper[fold+1:]
+        paper1 = newpaper[:fold]; paper2 = newpaper[fold+1:]
 
         r1 = list(range(len(paper1)))           # 0 to end
         r2 = list(range(len(paper2)-1,-1,-1))   # end to 0
@@ -54,23 +54,36 @@ def foldPaper(paper, type, fold, countOverlap = 0):
 
         for row in paper1:
             countOverlap += row.count('#')
-
+        
     if type == 'x':
-        for row in paper:
+        paper1 = []
+        for i in range(len(newpaper)):
+            row = newpaper[i]
             row1 = row[:fold]; row2 = row[fold+1:]
+
+            r1 = list(range(len(row1)))         # 0 to end
+            r2 = list(range(len(row2)-1,-1,-1)) # end to 0
+
+            for i in r1:
+                if row2[r2[i]] == '#': row1[i] = row2[r2[i]]
             
-            r1 = list(range(len(row1)-1,-1,-1)) # end to 0
-            r2 = list(range(len(row2)))         # 0 to end
+            paper1.append(row1)
+            countOverlap += row1.count('#')
 
-            for i in r2:
-                if row1[r1[i]] == '#': row2[i] = row1[r1[i]]
-
-            countOverlap += row2.count('#')   
-
-    return countOverlap
+    return paper1, countOverlap
 
 # Part 1 - fold paper according to first instruction
 paper = coordinatesFill(coordinates)
 
 firstInst = instructions[0]
-print(foldPaper(paper, type = firstInst[0], fold = firstInst[1]))
+paper1, countOverlap = foldPaper(newpaper = paper, type = firstInst[0], fold = firstInst[1])
+print(countOverlap)
+
+# Part 2 - fold paper with complete instructions and print letters
+paper = coordinatesFill(coordinates)
+
+for inst in instructions:
+    if inst == instructions[0]:
+        paper1, countOverlap = foldPaper(newpaper = paper, type = inst[0], fold = inst[1])
+    else: paper1, countOverlap = foldPaper(newpaper = paper1, type = inst[0], fold = inst[1])
+print(paper1)
