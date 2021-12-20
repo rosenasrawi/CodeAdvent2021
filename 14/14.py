@@ -1,3 +1,4 @@
+# Function to open datafile (input or example)
 def preprocessData(datafile):
     with open("/Users/rosenasrawi/Documents/VU PhD/Side projects/CodeAdvent2021/14" + datafile, "r") as polyFile:
         poly = polyFile.readlines()
@@ -16,9 +17,10 @@ def preprocessData(datafile):
 
     return counts, connections, insertions
 
+# Function to keep track of the count of each connection type in polymer 
 def insertPolymer(counts, connections, insertions):
-
     num2add = []; index2rem = []; index2add = []
+
     for i in range(len(counts)):
         if counts[i] > 0:
             num2add.append(counts[i])
@@ -37,22 +39,31 @@ def insertPolymer(counts, connections, insertions):
 
     return counts
 
-counts, connections, insertions = preprocessData(datafile = "/example14.txt")
+# Function to count the occurence of each letter in polymer, based on connections
+def letterCount(steps, counts, connections, insertions):
 
-for i in range(10):
-    counts = insertPolymer(counts, connections, insertions)
+    for i in range(steps):
+        counts = insertPolymer(counts, connections, insertions)
 
-letters = list(set(''.join(connections)))
-letterPosCount = [[0,0] for i in letters]
+    letters = list(set(''.join(connections)))
+    letterPosCount = [[0,0] for i in letters]
 
-for i in range(len(connections)):
-    if counts[i] > 0:
-        con = connections[i]
-        letterPosCount[letters.index(con[0])][0] += counts[i]
-        letterPosCount[letters.index(con[1])][1] += counts[i]
+    for i in range(len(connections)):
+        if counts[i] > 0:
+            con = connections[i]
+            letterPosCount[letters.index(con[0])][0] += counts[i]
+            letterPosCount[letters.index(con[1])][1] += counts[i]
 
-for i in range(len(letterPosCount)):
-    letterPosCount[i] = max(letterPosCount[i])
+    for i in range(len(letterPosCount)):
+        letterPosCount[i] = max(letterPosCount[i])
 
-print(letters)
-print(letterPosCount)
+    print(max(letterPosCount)-min(letterPosCount))
+
+# Preprocess data
+counts, connections, insertions = preprocessData(datafile = "/input14.txt")
+
+# Part 1 - count letters after 10 iterations, most - least occuring
+letterCount(10, counts, connections, insertions)
+
+# Part 2 - count letters after 40 iterations, most - least occuring
+letterCount(40, counts, connections, insertions)
