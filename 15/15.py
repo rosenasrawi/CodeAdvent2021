@@ -26,9 +26,9 @@ class Graph:
         self.v = num_of_vertices
         self.edges = [[-1 for i in range(num_of_vertices)] for j in range(num_of_vertices)]
         self.visited = []
-    def add_edge(self, u, v, weight):
-        self.edges[u][v] = weight
-        self.edges[v][u] = weight
+    def add_edge(self, u, v, weightu, weightv):
+        self.edges[u][v] = weightv
+        self.edges[v][u] = weightu
 
 # Functions to add edges to graph from input file
 def addEdgesToGraph(nodes, edges, numNodes):
@@ -38,13 +38,13 @@ def addEdgesToGraph(nodes, edges, numNodes):
     for row in range(len(nodes)): # horizontal steps
         name = nodes[row]; num = edges[row]
         for i in range(len(name)-1):
-            graph.add_edge(name[i], name[i+1], num[i+1])
+            graph.add_edge(name[i], name[i+1], num[i], num[i+1])
 
     for col in range(len(nodes[0])): # vertical steps
         name = [row[col] for row in nodes]
         num = [row[col] for row in edges]
         for i in range(len(name)-1):
-            graph.add_edge(name[i], name[i+1], num[i+1])
+            graph.add_edge(name[i], name[i+1], num[i], num[i+1])
 
     return graph
 
@@ -61,6 +61,8 @@ def dijkstra(graph, start_vertex):
         graph.visited.append(current_vertex)
 
         for neighbor in range(graph.v):
+        # for heighbor in range(adjacent(v)):
+            print(neighbor)
             if graph.edges[current_vertex][neighbor] != -1:
                 distance = graph.edges[current_vertex][neighbor]
                 if neighbor not in graph.visited:
@@ -71,7 +73,7 @@ def dijkstra(graph, start_vertex):
                         D[neighbor] = new_cost
     return D
 
-datafile = "/input.txt"
+datafile = "/input15.txt"
 nodes, edges, numNodes = preprocessData(datafile)
 
 g = addEdgesToGraph(nodes, edges, numNodes)
