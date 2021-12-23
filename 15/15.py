@@ -1,82 +1,63 @@
 from queue import PriorityQueue
+from math import isinf
 
-# Function to preprocess data
-def preprocessData(datafile):
+def preprocessData(datafile, bigdata):
+    with open("/Users/rosenasrawi/Documents/VU PhD/Side projects/CodeAdvent2021/15" + datafile, "r") as inputfile:
+            input = inputfile.readlines()
+            input = [list(i.rstrip('\n')) for i in input]
+            input = [list(map(int, i)) for i in input]
 
-    # Open data
-    with open("/Users/rosenasrawi/Documents/VU PhD/Side projects/CodeAdvent2021/15" + datafile, "r") as edgeFile:
-        edges = edgeFile.readlines()
-        edges = [list(i.rstrip('\n')) for i in edges]
-        edges = [list(map(int, i)) for i in edges]
+    if bigdata:
+        tiles = []
+        for ty in range(5):
+            for y in range(len(input)):
+                row = []
+                for tx in range(5):
+                    for x in range(len(input[0])):
+                        r = input[y][x] + tx + ty
+                        if r > 9: r -= 9
+                        row.append(r)
+                tiles.append(row)
+        return tiles      
 
-    # Determine names of nodes, and weights between them
-    names = []; numNodes = len(edges)*len(edges[0])
-    for i in range(numNodes): names.append(i)
+    else: return input
 
-    nodes = [[0 for i in edges[0]] for i in edges]
-    for i in range(len(edges)):
-        for j in range(len(edges[0])):
-            nodes[i][j] = names.pop(0)
+def neighbours(size, idx):
+    x = idx[0]; y = idx[1]; neighbours = []
+    candidates = [(x+1, y), (x-1, y), (x, y+1), (x, y-1)]
+    for candidate in candidates:
+        if 0 <= candidate[0] < size and 0 <= candidate[1] < size:
+            neighbours.append(candidate)
+    return neighbours
 
-    return nodes, edges, numNodes
+def dijkstra(input):
 
-# Class to initialise graph and add edges
-class Graph:
-    def __init__(self, num_of_vertices):
-        self.v = num_of_vertices
-        self.edges = [[-1 for i in range(num_of_vertices)] for j in range(num_of_vertices)]
-        self.visited = []
-    def add_edge(self, u, v, weightu, weightv):
-        self.edges[u][v] = weightv
-        self.edges[v][u] = weightu
-
-# Functions to add edges to graph from input file
-def addEdgesToGraph(nodes, edges, numNodes):
-    
-    graph = Graph(numNodes) # initialise a graph
-
-    for row in range(len(nodes)): # horizontal steps
-        name = nodes[row]; num = edges[row]
-        for i in range(len(name)-1):
-            graph.add_edge(name[i], name[i+1], num[i], num[i+1])
-
-    for col in range(len(nodes[0])): # vertical steps
-        name = [row[col] for row in nodes]
-        num = [row[col] for row in edges]
-        for i in range(len(name)-1):
-            graph.add_edge(name[i], name[i+1], num[i], num[i+1])
-
-    return graph
-
-# Function to run Dijkstra algorithm
-def dijkstra(graph, start_vertex):
-    D = {v:float('inf') for v in range(graph.v)}
-    D[start_vertex] = 0
-
+    visited = {(0, 0)}
+    distances = [[float('inf') for j in range(len(input[0]))]
+                 for i in range(len(input))]
+    distances[0][0] = 0
     pq = PriorityQueue()
-    pq.put((0, start_vertex))
+    pq.put((0, (0, 0)))
 
     while not pq.empty():
-        (dist, current_vertex) = pq.get()
-        graph.visited.append(current_vertex)
+        node = pq.get()
+        node = node[1]
+        neighbourlist = neighbours(len(input),node)
+        for neighbour in neighbourlist:
+            if not (neighbour in visited):
+                visited.add(neighbour)
+                newdist = distances[node[0]][node[1]] + \
+                    input[neighbour[0]][neighbour[1]]
+                if newdist < distances[neighbour[0]][neighbour[1]]:
+                    distances[neighbour[0]][neighbour[1]] = newdist
+                    pq.put((newdist, neighbour))
 
-        for neighbor in range(graph.v):
-        # for heighbor in range(adjacent(v)):
-            print(neighbor)
-            if graph.edges[current_vertex][neighbor] != -1:
-                distance = graph.edges[current_vertex][neighbor]
-                if neighbor not in graph.visited:
-                    old_cost = D[neighbor]
-                    new_cost = D[current_vertex] + distance
-                    if new_cost < old_cost:
-                        pq.put((new_cost, neighbor))
-                        D[neighbor] = new_cost
-    return D
+    return distances[-1][-1]
 
-datafile = "/input15.txt"
-nodes, edges, numNodes = preprocessData(datafile)
+# Part 1 - shortest path from top left to bottom right, original input
+input = preprocessData(datafile = "/input15.txt", bigdata = False)
+print(dijkstra(input))
 
-g = addEdgesToGraph(nodes, edges, numNodes)
-
-D = dijkstra(g, start_vertex = 0)
-print(D)
+# Part 2 - shortest path from top left to bottom right, big data
+input = preprocessData(datafile = "/input15.txt", bigdata = True)
+print(dijkstra(input))
