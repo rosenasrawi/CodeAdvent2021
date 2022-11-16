@@ -1,60 +1,83 @@
 
-def preprocessData(datafile):
-    with open("/Users/rosenasrawi/Documents/VU PhD/Side projects/CodeAdvent2021/16" + datafile, "r") as hexFile:
-        hex = hexFile.readlines()[0]
-        hex = hex.rstrip('\n')
-    return hex
+# hex = 'D2FE28' # literal
+hex = '38006F45291200' # operator ltype 0
+# hex = 'EE00D40C823060' # operator ltype 1
 
-# hex = preprocessData('/input16.txt')
+def hex2bin(hex: str, packet = '') -> str:
+    for i in hex: packet += str("{0:04b}".format(int(i, 16)))
+    return packet
 
-hex = '8A004A801A8002F478'
+packet = hex2bin(hex)
+version = 0
+pos = 0
 
-def hex2bin(hex: str, bin = '') -> str:
-    for i in hex: bin+=str("{0:04b}".format(int(i, 16)))
-    return bin
+def unpack(packet, version, pos):
+    
+    version += int(packet[:3],2) # Get version
+    type = int(packet[3:6],2) # Get type
+    pos += 6
 
-bin = hex2bin(hex)
+    if type == 4: # Literal
+        
+        start = int(packet[pos])
 
-print(bin)
+        while start == 1: # Keep parsing if starts with 1
+            pos += 5
+            start = int(packet[pos])
 
-def unpacking(bin, versionCount):
-    version = int(bin[:3],2) # First three numbers is the version
-    packet = int(bin[3:6],2) # Second three numbers is the packet
-    remfromBin = 0
-    bin = bin[6:]; remfromBin += 6
-    # print('hello')
-    versionCount += version # Add this number to the version count 
-
-    if packet == 4: # Literal
-        last = False
-        while not last:
-            next = bin[:5]
-            if next[0] == '1': # remove this number & continue
-                bin = bin[5:];  
-            elif next[1] == '0': # remove this number & stop
-                bin = bin[5:]; last = True
-            remfromBin += 5
+        pos += 5
 
     else: # Operator
-        lenTypeID = bin[0]
-        bin = bin[1:]; remfromBin += 1
 
-        if lenTypeID == '0': # Next 15 = len sub-packets
-            lenSubPackets = int(bin[:15],2)
-            bin = bin[15:]; remfromBin += 15
+        ltype = int(packet[pos]) # Length type ID
+        pos += 1
+        
+        if ltype == 0: # Length of subpackets
 
-            while remfromBin < lenSubPackets:
-                versionCount = unpacking(bin, versionCount)
+            lsubpack = int(packet[pos:pos+15],2)
+            pos += 15
+            oldpos = pos # Freeze this position
 
-        if lenTypeID == '1': # Next 11 = num of subpackets
-            numSubPackets = int(bin[:11],2)
-            bin = bin[11:]; remfromBin += 11
-            i = 0
-            while i < numSubPackets:
-                versionCount = unpacking(bin, versionCount)
-                i+=1
+            while lsubpack > 0:
+                version, pos = unpack(packet, version, pos)
+                diff = pos - oldpos
+                lsubpack -= diff
 
-    return versionCount
+        elif ltype == 1: # Number of subpackets
+            
+            nsubpack = int(packet[pos:pos+11],2)
+            pos += 11
 
-versionCount = unpacking(bin, versionCount=0)
-print(versionCount)
+            while nsubpack > 0:
+                version, pos = unpack(packet, version, pos)
+                nsubpack -= 1
+
+    return version, pos
+
+version, pos = unpack(packet, version, pos)
+
+print(version)
+
+
+# LOGIC
+
+# def unpack(bin):
+# if literal: 
+    # 1+4 nums repeat till 0
+# if operator:
+    # ltID = 0: 
+        # lSubpack
+        # unpack(packet)
+    # ltID = 1:
+        # nSubpack
+        # unpack(packet)
+
+# REAL DATA
+
+# def preprocessData(datafile):
+#     with open("/Users/rosenasrawi/Documents/VU PhD/Side projects/CodeAdvent2021/16" + datafile, "r") as hexFile:
+#         hex = hexFile.readlines()[0]
+#         hex = hex.rstrip('\n')
+#     return hex
+
+# hex = preprocessData('/input16.txt')
