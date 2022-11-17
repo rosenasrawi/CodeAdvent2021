@@ -23,8 +23,6 @@ def unpack(packet, version, pos):
 
     if type == 4: # Literal
 
-        print('literal')
-
         start = int(packet[pos])
 
         while start == 1: # Keep parsing if starts with 1
@@ -40,20 +38,16 @@ def unpack(packet, version, pos):
 
         if ltype == 0: # Length of subpackets
 
-            print('operator 0')
-
             lsubpack = int(packet[pos:pos+15],2)
             pos += 15; oldpos = pos
-            readlength = 0
 
-            while readlength < lsubpack:
+            while lsubpack > 0:
 
                 version, pos = unpack(packet, version, pos)
-                readlength += pos - oldpos
+                lsubpack -= pos - oldpos
+                oldpos = pos
 
         elif ltype == 1: # Number of subpackets
-
-            print('operator 1')
             
             nsubpack = int(packet[pos:pos+11],2)
             pos += 11
