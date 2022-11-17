@@ -1,7 +1,10 @@
 # Preprocess data
 
+import os
+
 def preprocessData(datafile):
-    with open("/Users/rosenasrawi/Documents/VU PhD/Side projects/CodeAdvent2021/16" + datafile, "r") as hexFile:
+    wd = os.getcwd()
+    with open(wd + "/16" + datafile, "r") as hexFile:
         hex = hexFile.readlines()[0]
         hex = hex.rstrip('\n')
     return hex
@@ -23,18 +26,25 @@ def unpack(packet, version, pos):
 
     if type == 4: # Literal
 
+        value = ''
         start = int(packet[pos])
 
         while start == 1: # Keep parsing if starts with 1
+            value += packet[pos+1:pos+5]
             pos += 5
             start = int(packet[pos])
 
+        if start == 0:
+            value += packet[pos+1:pos+5]
+
         pos += 5
+        value = int(value, 2)
         
     else: # Operator
         
         ltype = int(packet[pos]) # Length type ID
         pos += 1
+        values = []
 
         if ltype == 0: # Length of subpackets
 
@@ -43,7 +53,9 @@ def unpack(packet, version, pos):
 
             while lsubpack > 0:
 
-                version, pos = unpack(packet, version, pos)
+                version, pos, subval = unpack(packet, version, pos)
+                values.append(subval)
+
                 lsubpack -= pos - oldpos
                 oldpos = pos
 
@@ -53,21 +65,34 @@ def unpack(packet, version, pos):
             pos += 11
 
             while nsubpack > 0:
+                version, pos, subval = unpack(packet, version, pos)
+                values.append(subval)
 
-                version, pos = unpack(packet, version, pos)
-                nsubpack -= 1
+                nsubpack -= 1    
 
-    return version, pos
+        if type == 0:
+            value = sum(values)
+        elif type == 1:   
+            value = 1
+            for i in values:
+                value = value * i
+        elif type == 2:
+            value = min(values)
+        elif type == 3:
+            value = max(values)
+        elif type == 5:
+            value = int(values[0] > values[1])
+        elif type == 6:
+            value = int(values[0] < values[1])
+        elif type == 7:
+            value = int(values[0] == values[1])
+
+    return version, pos, value
 
 # Get data & run
 
-# hex = 'D2FE28' # literal
-# hex = '38006F45291200' # operator ltype 0
-# hex = 'EE00D40C823060' # operator ltype 1
-# hex = 'A0016C880162017C3686B18A3D4780' # example
-# packet = hex2bin(hex)
-
 packet = hex2bin(preprocessData('/input16.txt'))
-version, pos = unpack(packet, version = 0, pos = 0)
+version, pos, value = unpack(packet, version = 0, pos = 0)
 
-print(version)
+print('Part 1:', version)
+print('Part 2:', value)
