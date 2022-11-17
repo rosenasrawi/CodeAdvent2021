@@ -1,7 +1,19 @@
+# REAL DATA
+
+def preprocessData(datafile):
+    with open("/Users/rosenasrawi/Documents/VU PhD/Side projects/CodeAdvent2021/16" + datafile, "r") as hexFile:
+        hex = hexFile.readlines()[0]
+        hex = hex.rstrip('\n')
+    return hex
+
+hex = preprocessData('/input16.txt')
+print(hex)
 
 # hex = 'D2FE28' # literal
-hex = '38006F45291200' # operator ltype 0
+# hex = '38006F45291200' # operator ltype 0
 # hex = 'EE00D40C823060' # operator ltype 1
+
+# hex = 'A0016C880162017C3686B18A3D4780' # example 1
 
 def hex2bin(hex: str, packet = '') -> str:
     for i in hex: packet += str("{0:04b}".format(int(i, 16)))
@@ -13,8 +25,8 @@ pos = 0
 
 def unpack(packet, version, pos):
     
-    version += int(packet[:3],2) # Get version
-    type = int(packet[3:6],2) # Get type
+    version += int(packet[pos:pos+3],2) # Get version
+    type = int(packet[pos+3:pos+6],2) # Get type
     pos += 6
 
     if type == 4: # Literal
@@ -28,20 +40,21 @@ def unpack(packet, version, pos):
         pos += 5
 
     else: # Operator
-
+        
         ltype = int(packet[pos]) # Length type ID
         pos += 1
-        
+
         if ltype == 0: # Length of subpackets
 
             lsubpack = int(packet[pos:pos+15],2)
-            pos += 15
-            oldpos = pos # Freeze this position
+            pos += 15; oldpos = pos
+            readlength = 0
 
-            while lsubpack > 0:
+            while readlength < lsubpack:
+
                 version, pos = unpack(packet, version, pos)
                 diff = pos - oldpos
-                lsubpack -= diff
+                readlength += diff
 
         elif ltype == 1: # Number of subpackets
             
@@ -72,12 +85,3 @@ print(version)
         # nSubpack
         # unpack(packet)
 
-# REAL DATA
-
-# def preprocessData(datafile):
-#     with open("/Users/rosenasrawi/Documents/VU PhD/Side projects/CodeAdvent2021/16" + datafile, "r") as hexFile:
-#         hex = hexFile.readlines()[0]
-#         hex = hex.rstrip('\n')
-#     return hex
-
-# hex = preprocessData('/input16.txt')
