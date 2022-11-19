@@ -16,7 +16,7 @@ def preprocess(datafile):
 
 # Probe launcher dynamics
 
-def probeStep(pos, vel, ymax):
+def probeStep(pos, vel, yvals):
 
     pos[0] += vel[0]; pos[1] += vel[1] # velocity
     
@@ -25,31 +25,31 @@ def probeStep(pos, vel, ymax):
 
     vel[1] -= 1 # gravity
 
-    ymax.append(pos[1])
+    yvals.append(pos[1])
 
-    return pos, vel, ymax
+    return pos, vel, yvals
 
 # Find highest y with different velocities
 
 def findMaxy():
-    ymaxes = []
+    ymax = []
 
     for xv in list(range(1000)):
         for yv in list(range(1000)):
             
-            pos = [0,0]; vel = [xv,yv]; ymax = []
+            pos = [0,0]; vel = [xv,yv]; yvals = []
 
             while True:
 
                 target = x[0] <= pos[0] <= x[1] and y[0] <= pos[1] <= y[1]
                 missed = pos[0] > x[1] or pos[1] < y[1]
 
-                if target: ymaxes.append(max(ymax)); break
+                if target: ymax.append(max(yvals)); break
                 if missed: break
 
-                pos, vel, ymax = probeStep(pos, vel, ymax)
+                pos, vel, yvals = probeStep(pos, vel, yvals)
 
-    return max(ymaxes)            
+    return max(ymax)            
 
 # Data & run
 
