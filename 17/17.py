@@ -31,27 +31,34 @@ def probeStep(pos, vel, yvals):
 
 # Find highest y with different velocities
 
-def findMaxy():
-    ymax = []
+def findMaxy(x,y):
+    ymax = []; vels = 0
 
-    for xv in list(range(1000)):
-        for yv in list(range(1000)):
-            
+    for xv in list(range(x[1]+1)):
+        for yv in list(range(-1000,1000+1)):
             pos = [0,0]; vel = [xv,yv]; yvals = []
 
             while True:
 
                 target = x[0] <= pos[0] <= x[1] and y[0] <= pos[1] <= y[1]
-                missed = pos[0] > x[1] or pos[1] < y[1]
+                missed = pos[0] > x[1] or pos[1] < y[0]
 
-                if target: ymax.append(max(yvals)); break
+                if target: 
+                    ymax.append(max(yvals))
+                    vels+=1
+                    break
+                
                 if missed: break
 
                 pos, vel, yvals = probeStep(pos, vel, yvals)
 
-    return max(ymax)            
+    return max(ymax), vels
 
 # Data & run
 
 x,y = preprocess('/input17.txt')
-print('Part 1:', findMaxy())
+part1, part2 = findMaxy(x,y)
+
+print('Part 1:', part1)
+print('Part 2:', part2)
+
