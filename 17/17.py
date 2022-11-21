@@ -61,4 +61,3 @@ part1, part2 = findMaxy(x,y)
 
 print('Part 1:', part1)
 print('Part 2:', part2)
-
