@@ -1,11 +1,17 @@
-import math
+import math, os
 
-# Add two snailnumbers
+def preprocess(datafile):
+    wd = os.getcwd()
+    with open(wd + "/18" + datafile, "r") as snailFile:
+        snailnums = snailFile.readlines()
+        snailnums = [i.rstrip('\n') for i in snailnums]
+
+    return snailnums
+
 def add(snailnums):
     snailnum = '['+ snailnums[0] + ',' + snailnums[1] + ']'   
     return snailnum
 
-# Snailnumber string to list
 def string2list(snailnum):
     snaillist = []
     for i in list(range(len(snailnum))):
@@ -15,14 +21,12 @@ def string2list(snailnum):
 
     return snaillist
 
-# Reduce snailnum
-def reduce(snailnum):
+def explode(snailnum):
     snailnum = string2list(snailnum)
-    boom = False; crack = False
-    nest = 0; i = 0
+    boom = False; nest = 0; i = 0
 
     while True:
-        
+
         if snailnum[i] == '[': nest += 1
         elif snailnum[i] == ']': nest -= 1
         
@@ -48,6 +52,17 @@ def reduce(snailnum):
             boom = True
             break
 
+        i+=1
+
+        if i == len(snailnum)-1: break # End of snailnum
+
+    return ''.join(snailnum), boom
+
+def split(snailnum):
+    snailnum = string2list(snailnum)
+    crack = False; i = 0
+
+    while True:
         if snailnum[i].isnumeric(): # Split
             if int(snailnum[i]) >= 10: 
                 half = int(snailnum[i])/2
@@ -60,51 +75,46 @@ def reduce(snailnum):
 
         if i == len(snailnum)-1: break # End of snailnum
 
-    return ''.join(snailnum), boom, crack
+    return ''.join(snailnum), crack
 
-# Reduce snailnum with explosions & splits
 def snailmath(snailnums):
 
     while True:
-        if len(snailnums) == 1: break
-        snailnum = add(snailnums)
-        print(snailnum)
+        if len(snailnums) > 1: snailnum = add(snailnums)
+        else: snailnum = snailnums[0]
     
         while True:
-            snailnum, boom, crack = reduce(snailnum)
+            snailnum, boom = explode(snailnum)
+
+            if not boom: 
+                snailnum, crack = split(snailnum)
 
             if not boom and not crack: break
 
-        print(snailnum)
         snailnums[0] = snailnum; snailnums.pop(1)
+        
+        if len(snailnums) == 1: break
 
     return snailnum
 
+def magnitude(snailnum):
+    snailnum = string2list(snailnum); i = 0
 
-snailnums = ['[[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]' , '[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]']
+    while True:
+        if snailnum[i] == ']':
 
-snailmath(snailnums)
+            pair = [i-3,i-1]
+            mag = 3*int(snailnum[pair[0]]) + 2*int(snailnum[pair[1]])
 
-# def sum(snailnums):
-    # while pair:
-        # magnitude = pair[0]*3 + pair[1]*2
-    # return magnitude
+            snailnum[pair[0]-1:pair[1]+2] = '0'
+            snailnum[pair[0]-1] = str(mag)
 
-# def mathhomework(snailnums)
-    # while len(snailnums) > 1
-        # snailnum = add(snailnums[0], snailnums[1])
-        # snailnum = reduce(snailnum)
+            i = 0
         
-        # snailnums.pop(0,1)
-        # snailnums = [snailnum, snailnums]
+        if len(snailnum) == 1: break
 
-    # magnitude = sum(snailnums)    
-        
+        i+=1
 
-    # return magnitude
+    return ''.join(snailnum)    
 
-# magnitude = mathhomework(snailnums)
-
-# print('Part 1:', magnitude)
-
-
+print('Part 1:', magnitude(snailmath(preprocess('/input18.txt'))))
