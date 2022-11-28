@@ -1,4 +1,5 @@
 import math, os
+from itertools import product
 
 def preprocess(datafile):
     wd = os.getcwd()
@@ -102,7 +103,6 @@ def magnitude(snailnum):
 
     while True:
         if snailnum[i] == ']':
-
             pair = [i-3,i-1]
             mag = 3*int(snailnum[pair[0]]) + 2*int(snailnum[pair[1]])
 
@@ -114,7 +114,24 @@ def magnitude(snailnum):
         if len(snailnum) == 1: break
 
         i+=1
-
     return ''.join(snailnum)    
 
+def maximum(snailnums):
+    max = 0
+    for i in list(range(len(snailnums))):
+
+        nums = snailnums.copy()
+        num = [nums.pop(i)]
+
+        combs = []
+        combs = list(list(zip(num, element))
+                    for element in product(nums, repeat = len(num)))
+
+        for comb in combs:
+            mag = magnitude(snailmath(list(comb[0])))
+            if int(mag) >= max: max = int(mag)
+
+    return max
+
 print('Part 1:', magnitude(snailmath(preprocess('/input18.txt'))))
+print('Part 2:', maximum(preprocess('/input18.txt')))
